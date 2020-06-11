@@ -1,0 +1,9 @@
+/.idea/*
+/venv/*
+/_pycache_/*
+/__pycache__/*
+*.gz
+*.ipynb
+/aws-secret.cfg
+/notes_perso.txt
+
