@@ -200,12 +200,56 @@ time_table_insert = ("""
 """)
 
 
+# TODO: Removing duplicates in 'users' and 'artists' tables.
+temp_user_table_create = ("""
+    CREATE TABLE IF NOT EXISTS temp_users(
+        user_id INT,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        gender VARCHAR(1),
+        level TEXT
+    );
+""")
+
+
+temp_artist_table_create = ("""
+    CREATE TABLE IF NOT EXISTS temp_artists(
+        artist_id TEXT,
+        name TEXT NOT NULL,
+        location TEXT,
+        latitude TEXT,
+        longitude TEXT
+    );
+""")
+
+
+load_temp_users = ("""
+    INSERT INTO temp_users
+        SELECT DISTINCT(user_id), first_name, last_name, gender, level FROM users;
+""")
+
+
+load_temp_artists = ("""
+    INSERT INTO temp_artists
+        SELECT DISTINCT(artist_id), name, location, latitude, longitude FROM artists;
+""")
+
+
+rename_temp_user = ("""
+    ALTER TABLE temp_users RENAME TO users
+""")
+
+
+rename_temp_artist = ("""
+    ALTER TABLE temp_artists RENAME TO artists
+""")
+
+
 # QUERY LISTS
 
 create_table_queries = [staging_events_table_create, staging_songs_table_create, songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
-# create_table_queries = [user_table_create]
-# drop_table_queries = [user_table_drop]
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
-copy_table_queries = [staging_events_copy, staging_songs_copy]
-# insert_table_queries = [user_table_insert]
+load_staging_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert, time_table_insert]
+remove_duplicate_users_queries = [temp_user_table_create, load_temp_users, user_table_drop, rename_temp_user]
+remove_duplicate_artists_queries = [temp_artist_table_create, load_temp_artists, artist_table_drop, rename_temp_artist]

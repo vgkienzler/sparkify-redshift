@@ -1,24 +1,25 @@
 import configparser
 import psycopg2 as pg
-from sql_queries import copy_table_queries, insert_table_queries
+from sql_queries import load_staging_table_queries, insert_table_queries, remove_duplicate_users_queries, \
+    remove_duplicate_artists_queries
 
 
-def load_staging_tables(cur, conn):
-    for query in copy_table_queries:
-        print(f"Query being executed: {query}.")
-        cur.execute(query)
-        conn.commit()
-
-
-def insert_tables(cur, conn):
-    for query in insert_table_queries:
+def run_queries(cur, conn, query_list):
+    """
+    Run queries in query_list,
+    arguments: psycopg2 cursor and connection objects, sql query lists (strings).
+    """
+    for query in query_list:
         print(f"Query being executed: {query}.")
         cur.execute(query)
         conn.commit()
 
 
 def main():
+    """
+    """
     config = configparser.ConfigParser()
+    # TODO: find a way to remove local reference to 'dwh.cfg', 'CLUSTER', and all the sections:
     config.read('dwh.cfg')
 
     cl_values = list(config['CLUSTER'].values())
@@ -32,13 +33,18 @@ def main():
 
     print("Connection established, cursor created.")
     
-    load_staging_tables(cur, conn)
-    
+    # load staging tables:
+    run_queries(cur, conn, load_staging_table_queries)
     print("Staging tables loaded.")
     
-    insert_tables(cur, conn)
-    
+    # insert data from staging tables:
+    run_queries(cur, conn, insert_table_queries)
     print("Table(s) inserted.")
+
+    # remove users and artists duplicates:
+    run_queries(cur, conn, remove_duplicate_users_queries)
+    run_queries(cur, conn, remove_duplicate_artists_queries)
+    print("User and artists duplicates removed.")
 
     conn.close()
 

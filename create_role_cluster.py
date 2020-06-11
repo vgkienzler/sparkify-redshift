@@ -15,6 +15,7 @@ import json
 
 CONFIG_FILE_NAME = 'dwh.cfg'
 CONFIG_SECRET_FILE_NAME = 'aws-secret.cfg'
+# TODO: see if there is a way to replace local reference to sections/keys and centralise these.
 
 
 def update_section_key(file_name, section, key, value):
