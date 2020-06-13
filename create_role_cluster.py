@@ -7,6 +7,7 @@ Contains the following functions:
 - create_redshift_cluster()
 - main()
 """
+import sys
 
 import boto3
 import configparser
@@ -114,22 +115,57 @@ def create_redshift_cluster(parser, section_name, redshift_client, cluster_id, c
         return 1
 
 
+class AwsCredentials:
+    """
+    AWS connection, contains two attributes (key and secret key), the credentials  of a user with
+    access to AWS db.
+    Upon init, check if config file passed in argument exist and extract the key and secret key from
+    the file. Print error messages if the file specified doesn't exist or if the section 'AWS' and
+    options 'key', 'secret' don't exist in the config file.
+    """
+    def __init__(self, file):
+        self.file = file
+        self.key = ''
+        self.secret = ''
+        self.section = 'AWS'
+        self.option_key = 'key'
+        self.option_secret = 'secret'
+
+        # Read and extract data form config file:
+        try:
+            with open(self.file) as config_file:
+                parser = configparser.ConfigParser()
+                parser.read_file(config_file)
+
+            self.key = parser.get(self.section, self.option_key)
+            self.secret = parser.get(self.section, self.option_secret)
+        except FileNotFoundError:
+            print(f"Config file '{self.file}' not found. \nExiting.")
+            sys.exit(1)
+        except configparser.NoSectionError:
+            print(f"Section '{self.section}' does not exist in file '{self.file}'."
+                  f" Please check your configuration file. Exiting.")
+            sys.exit(1)
+        except configparser.NoOptionError as e:
+            print(f"Section '{e.option}' does not exist in file '{self.file}'."
+                  f" Please check your configuration file. Exiting.")
+            sys.exit(1)
+
+
 def main():
     """
     """
-    # Read and extract data form configs file (secret file and non-secret).
-    with open(CONFIG_SECRET_FILE_NAME) as config_secret_file:
-        config_secret = configparser.ConfigParser()
-        config_secret.read_file(config_secret_file)
+    aws_cred = AwsCredentials(CONFIG_SECRET_FILE_NAME)
 
+    # Read and extract data from non secret config file.
     with open(CONFIG_FILE_NAME) as config_file:
         config = configparser.ConfigParser()
         config.read_file(config_file)
 
-    aws_key = config_secret.get('AWS', 'key')
-    aws_secret = config_secret.get('AWS', 'secret')
+    aws_key = aws_cred.key
+    aws_secret = aws_cred.secret
+
     aws_region = config.get('AWS', 'region')
-    aws_user = config.get('AWS', 'aws_user')
 
     print(f"Config data extracted from '{CONFIG_SECRET_FILE_NAME} and {CONFIG_FILE_NAME}'.")
 
@@ -151,7 +187,7 @@ def main():
         print(f"Role '{role_name_iam}' already exists, not creating a new role.")
 
     # Update roleArn in dwh.cfg
-    update_section_key('dwh.cfg', 'IAM_ROLE', 'arn', arn_role_iam)
+    update_section_key(CONFIG_FILE_NAME, 'IAM_ROLE', 'arn', arn_role_iam)
     print(f"Config file '{CONFIG_FILE_NAME}' updated with role arn.")
 
     # Attach a policy to the role

@@ -28,7 +28,7 @@ def advanced_input(authorised_input):
 def main():
     """Launches all the steps required to create the data tables in redshift."""
 
-    # Launches the creation of an IAM role and redshif clusters if they don't already exists:
+    # Launches the creation of an IAM role and redshift clusters if they don't already exists:
     client, cluster_name = create_rc.main()
 
     # Check redshift cluster's availability. If available, create the tables:

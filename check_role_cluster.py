@@ -1,5 +1,5 @@
 """
-This module contains usefull functions to check on a redshift cluster and IAM role.
+This module contains useful functions to check on a redshift cluster and IAM role.
 Contains the following functions:
 - get_role_details()
 - check_role_exists()
@@ -10,7 +10,6 @@ Contains the following functions:
 """
 
 import botocore.exceptions as e
-import boto3
 
 
 def get_role_details(client, role_name):
@@ -20,19 +19,19 @@ def get_role_details(client, role_name):
     Print the details.
     """
     try:
-        the_role = client.get_role(RoleName = role_name)
+        the_role = client.get_role(RoleName=role_name)
     except client.exceptions.NoSuchEntityException:
         print(f"Role {role_name} cannot be found.")
-    else:   
+    else:
         print(
             f"Role {role_name} exists, created on {the_role['Role']['CreateDate']}.\n"
             f"Role ID: {the_role['Role']['RoleId']}.\n"
             f"Role ARN: {the_role['Role']['Arn']}.\n"
             f"Role description: \'{the_role['Role']['Description']}\'.\n"
         )
-        
 
-def check_role_exists(client, role_name, details = False, **print_details):
+
+def check_role_exists(client, role_name, details=False, **print_details):
     """
     Checks if an IAM role with name 'role_name' (string) exists.
     If the option to print details has been set with any of the keyword
@@ -44,14 +43,14 @@ def check_role_exists(client, role_name, details = False, **print_details):
     """
     # First check if the caller wants to print the details of the role and function results
     # or not. By default they are not printed.
-    print_details = {**print_details, 'details' : details}
+    print_details = {**print_details, 'details': details}
     keywords_triggers_printing = ['details', 'print_details', 'pd']
     for key in print_details:
         if (key in keywords_triggers_printing) & (print_details[key] == True):
             details = True
     # Now collect role details.
     try:
-        the_role = client.get_role(RoleName = role_name)
+        client.get_role(RoleName=role_name)
     except client.exceptions.NoSuchEntityException:
         if details:
             print(f"Role {role_name} cannot be found.")
@@ -78,7 +77,7 @@ def get_cluster_details(client, cluster_name):
         # and not when 'creating'
         if cluster['ClusterStatus'] == 'creating':
             print(f"Cluster {cluster_name} being created.")
-        else :
+        else:
             print(
                 f"Cluster {cluster_name} exists, created on {cluster['ClusterCreateTime']}.\n"
                 f"Cluster endpoint: '{cluster['Endpoint']['Address']}'."
@@ -89,9 +88,9 @@ def get_cluster_details(client, cluster_name):
             f"Cluster status: {cluster['ClusterStatus']}.\n"
             f"Cluster zone: {cluster['AvailabilityZone']}."
         )
-            
 
-def check_cluster_exists(client, cluster_name, details = False,  **print_details):
+
+def check_cluster_exists(client, cluster_name, details=False, **print_details):
     """
     Checks if a cluster with 'cluster_name'(string) in 'client' (botocore.client.Redshift
     object) exists.
@@ -104,7 +103,7 @@ def check_cluster_exists(client, cluster_name, details = False,  **print_details
     """
     # First check if the caller wants to print the details of the role and function results
     # or not. By default they are not printed.
-    print_details = {**print_details, 'details' : details}
+    print_details = {**print_details, 'details': details}
     keywords_triggers_printing = ['details', 'print_details', 'pd']
     for key in print_details:
         if (key in keywords_triggers_printing) & (print_details[key] == True):
@@ -131,7 +130,7 @@ def is_cluster_available(client, cluster_name):
     
     If cluster cannot be found, prints 'This cluster cannot be found.'
     Returns 1 if cluster cannot be found.
-    """    
+    """
     try:
         client.describe_clusters(ClusterIdentifier=cluster_name)
     except e.ClientError:
@@ -140,7 +139,7 @@ def is_cluster_available(client, cluster_name):
     if client.describe_clusters(ClusterIdentifier=cluster_name)['Clusters'][0]['ClusterStatus'] == 'available':
         return True
     else:
-        return False    
+        return False
 
 
 def check_cluster_status(client, cluster_name):
