@@ -10,7 +10,7 @@ def run_queries(cur, conn, query_list):
     arguments: psycopg2 cursor and connection objects, sql query lists (strings).
     """
     for query in query_list:
-        print(f"Query being executed: {query}.")
+        print(f"\nQuery being executed: {query}")
         cur.execute(query)
         conn.commit()
 

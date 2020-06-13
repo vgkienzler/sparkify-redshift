@@ -141,15 +141,15 @@ class AwsCredentials:
             self.key = parser.get(self.section, self.option_key)
             self.secret = parser.get(self.section, self.option_secret)
         except FileNotFoundError:
-            print(f"Config file '{self.file}' not found. \nExiting.")
+            print(f"\033[0;31mConfig file '{self.file}' not found.\nExiting.\033[0m")
             sys.exit(1)
         except configparser.NoSectionError:
-            print(f"Section '{self.section}' does not exist in file '{self.file}'."
-                  f" Please check your configuration file. Exiting.")
+            print(f"\033[0;31mSection '{self.section}' does not exist in file '{self.file}'."
+                  f" Please check your configuration file.\nExiting.\033[0m")
             sys.exit(1)
         except configparser.NoOptionError as e:
-            print(f"Section '{e.option}' does not exist in file '{self.file}'."
-                  f" Please check your configuration file. Exiting.")
+            print(f"\033[0;31mSection '{e.option}' does not exist in file '{self.file}'."
+                  f" Please check your configuration file.\nExiting.\033[0m")
             sys.exit(1)
 
 
@@ -185,7 +185,7 @@ def main():
         print(f"Role '{role_name_iam}' created.")
     else:
         arn_role_iam = iam.get_role(RoleName=role_name_iam)['Role']['Arn']
-        print(f"Role '{role_name_iam}' already exists, not creating a new role.")
+        print(f"\033[0;33mRole '{role_name_iam}' exists already, not creating a new role.\033[0m")
 
     # Update roleArn in dwh.cfg
     update_section_key(CONFIG_FILE_NAME, 'IAM_ROLE', 'arn', arn_role_iam)
@@ -208,7 +208,7 @@ def main():
         create_redshift_cluster(config, 'CLUSTER', redshift, cluster_name, arn_role_iam)
         print(f"Cluster '{cluster_name}' created. Wait for availability.")
     else:
-        print(f"Cluster '{cluster_name}' already exists, not creating a new cluster.")
+        print(f"\033[0;33mCluster '{cluster_name}' exists already, not creating a new cluster.\033[0m")
 
     return redshift, cluster_name
 

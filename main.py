@@ -13,14 +13,18 @@ def advanced_input(authorised_input):
     If the input is not in list authorised_input, raises an exception and ask for a new input.
     If user's input is in 'authorised_input' returns the user's input.
     """
+    message = ''
+    for each in authorised_input:
+        message += each + ","
+    message = message[:-1]
     while True:
         try:
-            user_input = input("Please enter you choice:\n")
+            user_input = input(f"\n\033[6;30;42m Please enter you choice ({message}):\033[0m\n")
             assert user_input in authorised_input
         except (ValueError, AssertionError):
-            print("Input Error: only '", end='')
+            print("\033[0;31mInput Error: only '", end='')
             print(*authorised_input, sep="', '", end="'")
-            print(" are valid inputs.\nPlease enter a valid input.\n")
+            print(" are valid inputs.\nPlease enter a valid input.\n\033[0m")
         else:
             return user_input
 

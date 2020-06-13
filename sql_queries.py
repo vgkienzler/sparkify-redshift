@@ -62,31 +62,31 @@ songplay_table_create = ("""
         start_time BIGINT NOT NULL,
         user_id INT NOT NULL,
         level TEXT,
-        song_id TEXT,
+        song_id TEXT sortkey,
         artist_id TEXT,
         session_id INT NOT NULL,
         location TEXT,
         user_agent TEXT
-    );
+    ) diststyle even;
 """)
 
 
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users(
-        user_id INT,
+        user_id INT sortkey,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         gender VARCHAR(1),
         level TEXT
-    );
+    ) diststyle all;
 """)
 
 
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs(
-        song_id TEXT,
+        song_id TEXT distkey,
         title TEXT NOT NULL,
-        artist_id TEXT NOT NULL,
+        artist_id TEXT NOT NULL sortkey,
         year INT,
         duration NUMERIC
     );
@@ -95,7 +95,7 @@ song_table_create = ("""
 
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists(
-        artist_id TEXT,
+        artist_id TEXT sortkey distkey,
         name TEXT NOT NULL,
         location TEXT,
         latitude TEXT,
@@ -106,7 +106,7 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time(
-        start_time TIMESTAMP,
+        start_time TIMESTAMP distkey,
         hour INT,
         day INT,
         week INT,
@@ -202,18 +202,19 @@ time_table_insert = ("""
 
 temp_user_table_create = ("""
     CREATE TABLE IF NOT EXISTS temp_users(
-        user_id INT,
+        user_id INT sortkey,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         gender VARCHAR(1),
         level TEXT
-    );
+    )
+    diststyle all;
 """)
 
 
 temp_artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS temp_artists(
-        artist_id TEXT,
+        artist_id TEXT sortkey distkey,
         name TEXT NOT NULL,
         location TEXT,
         latitude TEXT,
