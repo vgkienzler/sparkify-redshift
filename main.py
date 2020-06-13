@@ -25,7 +25,7 @@ def advanced_input(authorised_input):
 
 
 def main():
-    """This function launches all the activities required to create the data tables in redshift."""
+    """Launches all the steps required to create the data tables in redshift."""
 
     # Launches the creation of an IAM role and redshif clusters if they don't already exists:
     client, cluster_name = create_rc.main()
@@ -35,7 +35,8 @@ def main():
 
     if cluster_status == 'creating':
         print(f"Cluster '{cluster_name}' is being created.\n" +
-              "This can take several minutes. Do you want to Wait (W) or Exit (Q)?\n")
+              "This can take several minutes. Do you want to Wait (W) or Exit (Q)?\n" +
+              "Exiting won't interrupt cluster creation. You can resume later by re-launching main.py")
         valid_choices = ['q', 'Q', 'w', 'W']
         waiting = advanced_input(valid_choices)
 
@@ -49,6 +50,7 @@ def main():
                 print(f"Waiting... cluster status: {cluster_status}.")
 
     if cluster_status == 'available':
+        print("Cluster available.")
         cluster = client.describe_clusters(ClusterIdentifier=cluster_name)['Clusters'][0]
         # TODO: remove local reference to 'dwh.cfg'.
         create_rc.update_section_key('dwh.cfg', 'CLUSTER', 'cl_endpoint', cluster['Endpoint']['Address'])
