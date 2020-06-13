@@ -200,7 +200,6 @@ time_table_insert = ("""
 """)
 
 
-# TODO: Removing duplicates in 'users' and 'artists' tables.
 temp_user_table_create = ("""
     CREATE TABLE IF NOT EXISTS temp_users(
         user_id INT,

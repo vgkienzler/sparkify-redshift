@@ -6,9 +6,10 @@ Contains the following functions:
 - attach_policy_to_role()
 - create_redshift_cluster()
 - main()
+and the following class:
+- AwsCredentials.
 """
 import sys
-
 import boto3
 import configparser
 import check_role_cluster as crc
