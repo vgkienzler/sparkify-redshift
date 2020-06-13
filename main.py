@@ -3,6 +3,7 @@ import check_role_cluster as check_rc
 import create_tables
 import sys
 import time
+import etl
 
 
 def advanced_input(authorised_input):
@@ -50,16 +51,28 @@ def main():
                 print(f"Waiting... cluster status: {cluster_status}.")
 
     if cluster_status == 'available':
-        print("Cluster available.")
         cluster = client.describe_clusters(ClusterIdentifier=cluster_name)['Clusters'][0]
         # TODO: remove local reference to 'dwh.cfg'.
         create_rc.update_section_key('dwh.cfg', 'CLUSTER', 'cl_endpoint', cluster['Endpoint']['Address'])
-        create_tables.main()
+
+        # When cluster available ask the user if she wants to launch the etl process:
+        print(f"Cluster '{cluster_name}' available.\n" +
+              "Do you want to create tables and launch the ETL process? Yes (Y), No (n)?\n" +
+              "This will drop existing tables, re-create them and load data.")
+        valid_choices = ['y', 'Y', 'n', 'N']
+        launch_etl = advanced_input(valid_choices)
+        if launch_etl.lower() == 'y':
+            create_tables.main()
+            etl.main()
+        else:
+            sys.exit(0)
+
     else:
         print(f"Cluster '{cluster_name}' current status: '{cluster_status}'.\n"
               "Please activate or repair the cluster and relaunch the program.\n"
               "Exiting.")
         sys.exit(1)
+
     print("The End.")
 
 
